@@ -1,0 +1,27 @@
+td {
+    width: 50px;
+    height: 50px;
+    border: 1px solid black;
+    background-color: #bb8855;
+}
+
+.peg {
+    margin: auto;
+    background-color: red;
+    border: 1px solid black;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.red {
+    background-color: red;
+}
+
+.black {
+    background-color: gray;
+}
+
+.empty {
+    visibility: hidden;
+}
