@@ -160,12 +160,12 @@ function value(player, depth, alpha, beta, maxPlayer) {
             if ( !valid(i, j, player) ) continue;
             if ( xx == -1 ) { xx = i; yy = j; }
 
-            var tmp = map;
+            var tmp = $.extend(true, [], map);
 
             move(i, j, player);
             var r = value(-player, depth-1, alpha, beta, maxPlayer);
 
-            map = tmp;
+            map = $.extend(true, [], tmp);
 
             if ( player == maxPlayer ) {
                 if ( r.v > alpha ) {
