@@ -151,7 +151,7 @@ function value(player, depth, alpha, beta, maxPlayer) {
         return {x: -1, y: -1, v: val};
     }
 
-    if ( depth == 0 ) return {x: -1, y: -1, v: score()};
+    if ( depth == 0 ) return {x: -1, y: -1, v: score(maxPlayer)};
 
     stateCount++;
     var cut = false;
@@ -243,7 +243,7 @@ function init() {
 
 function moveAI() {
     stateCount = 0;
-    //var d = currentPlayer == X ? 2 : 6;
+    //thinkingDepth = currentPlayer == X ? 2 : 4;
     var m = value(currentPlayer, thinkingDepth, -INF, INF, currentPlayer);
     move(m.x, m.y, currentPlayer);
     console.log("Number of processed states: " + stateCount);
