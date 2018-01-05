@@ -6,7 +6,7 @@ console.log("@author Saeed Nejati");
 var X = 1;
 var O = -1;
 var INF = 2000000000;
-var thinkingDepth = 2;
+var thinkingDepth = 4;
 
 var delay = 500;
 
@@ -116,9 +116,9 @@ function winner() {
     return INF;
  }
 
-/** Calculates the score of a board
+/** Calculates the score of a board for a player
  *  (leaf node) */
-function score() {
+function score(player) {
     var weight = [
         [ 5,  2,  2,  2,  2,  2,  2,  5],
         [ 2, -1, -1, -1, -1, -1, -1,  2],
@@ -130,15 +130,15 @@ function score() {
         [ 5,  2,  2,  2,  2,  2,  2,  5],
     ];
 
-    weight[1][1] = weight[1][0] = weight[0][1] = (map[0][0] == X) ? 2 : -1;
- 	weight[1][6] = weight[1][7] = weight[0][6] = (map[0][7] == X) ? 2 : -1;
- 	weight[6][1] = weight[7][1] = weight[6][0] = (map[7][0] == X) ? 2 : -1;
- 	weight[6][6] = weight[7][6] = weight[6][7] = (map[7][7] == X) ? 2 : -1;
+    weight[1][1] = weight[1][0] = weight[0][1] = (map[0][0] == player) ? 2 : -1;
+ 	weight[1][6] = weight[1][7] = weight[0][6] = (map[0][7] == player) ? 2 : -1;
+ 	weight[6][1] = weight[7][1] = weight[6][0] = (map[7][0] == player) ? 2 : -1;
+ 	weight[6][6] = weight[7][6] = weight[6][7] = (map[7][7] == player) ? 2 : -1;
 
     var s = 0;
     for( var i=0; i<8; i++ )
         for( var j=0; j<8; j++ )
-            s += map[i][j] * weight[i][j];
+            s += (map[i][j] == player ? 1 : map[i][j] == -player ? -1 : 0) * weight[i][j];
 
     return s;
 }
@@ -146,7 +146,10 @@ function score() {
 /** The main alpha-beta search function */
 function value(player, depth, alpha, beta, maxPlayer) {
     var w = winner();
-    if ( w != INF ) return {x: -1, y: -1, v: w*INF};
+    if ( w != INF ) {
+        var val = (w == 0 ? 0 : w == maxPlayer ? INF : -INF);
+        return {x: -1, y: -1, v: val};
+    }
 
     if ( depth == 0 ) return {x: -1, y: -1, v: score()};
 
@@ -240,6 +243,7 @@ function init() {
 
 function moveAI() {
     stateCount = 0;
+    //var d = currentPlayer == X ? 2 : 6;
     var m = value(currentPlayer, thinkingDepth, -INF, INF, currentPlayer);
     move(m.x, m.y, currentPlayer);
     console.log("Number of processed states: " + stateCount);
