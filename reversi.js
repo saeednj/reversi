@@ -6,7 +6,9 @@ console.log("@author Saeed Nejati");
 var X = 1;
 var O = -1;
 var INF = 2000000000;
-var thinkingDepth = 6;
+var thinkingDepth = 2;
+
+var delay = 500;
 
 var map;
 
@@ -87,24 +89,30 @@ function updateBoard() {
             if ( map[i][j] ) put(i, j, map[i][j]);
 }
 
+/** Counts the number of Xs and Os on the board */
+function count() {
+    var x = 0, o = 0, e = 0;
+
+    for( var i=0; i<8; i++ )
+       for( var j=0; j<8; j++ )
+           if ( map[i][j] == X ) x++;
+           else if ( map[i][j] == O ) o++;
+           else e++;
+    return {x: x, o: o, e: e};
+}
+
 /** Checks if any player has won the game
  * @return 1   if X is winner
  *         -1  if O is winner
  *         0   if Draw
  *         INF if not finished
  */
- function winner() {
-     var x = 0, o = 0, e = 0;
-
-     for( var i=0; i<8; i++ )
-        for( var j=0; j<8; j++ )
-            if ( map[i][j] == X ) x++;
-            else if ( map[i][j] == O ) o++;
-            else e++;
-    if ( e == 0 ) return (x > o ? X : x<o ? O : 0);
-    if ( o == 0 && x > 0 ) return X;
-    if ( x == 0 && o > 0 ) return O;
-    if ( !hasValidMove(X) && !hasValidMove(O) ) return (x > o ? X : x<o ? O : 0);
+function winner() {
+    var c = count();
+    if ( c.e == 0 ) return (c.x > c.o ? X : c.x<c.o ? O : 0);
+    if ( c.o == 0 && c.x > 0 ) return X;
+    if ( c.x == 0 && c.o > 0 ) return O;
+    if ( !hasValidMove(X) && !hasValidMove(O) ) return (c.x > c.o ? X : c.x<c.o ? O : 0);
     return INF;
  }
 
@@ -180,6 +188,11 @@ function value(player, depth, alpha, beta, maxPlayer) {
     }
 
     return {x: xx, y: yy, v: beta};
+}
+
+
+function strPlayer(player) {
+    return player == X ? "Black" : "Red";
 }
 
 /* Main structure */
