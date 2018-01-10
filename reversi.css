@@ -25,3 +25,7 @@ td {
 .empty {
     visibility: hidden;
 }
+
+#result, #score, #info, #options {
+    font-family: sans serif;
+}

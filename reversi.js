@@ -13,6 +13,7 @@ var delay = 500;
 var map;
 
 var currentPlayer;
+var playerType = {"Black" : "Human", "Red" : "Human"};
 
 var stateCount;
 
@@ -237,8 +238,23 @@ function init() {
 
     currentPlayer = X;
     stateCount = 0;
-
     $("td").click(moveUser);
+    $("#result").html("Result:")
+}
+
+function setupHandlers() {
+    $("#newgame").click(function(){
+        playerType["Black"] = $("#blackplayer").find(":selected").val();
+        playerType["Red"] = $("#redplayer").find(":selected").val();
+        var level = $("#ailevel").find(":selected").val();
+        if ( level == "easy" ) thinkingDepth = 1;
+        else if ( level == "medium" ) thinkingDepth = 2;
+        else thinkingDepth = 4;
+        console.log(playerType);
+        console.log("Thinking Depth: " + thinkingDepth);
+        init();
+        run();
+    });
 }
 
 function moveAI() {
@@ -272,10 +288,11 @@ function run() {
         next();
     }
     else {
-        moveAI();
-        //console.log(c);
+        if ( playerType[strPlayer(currentPlayer)] == "AI" )
+            moveAI();
     }
 }
 
 init();
+setupHandlers();
 run();
