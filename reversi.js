@@ -201,21 +201,6 @@ function strPlayer(player) {
 
 /* Main structure */
 
-function moveUser() {
-    var clickedCellID = $(this).find("div").attr("id");
-    var x = parseInt(clickedCellID[1]);
-    var y = parseInt(clickedCellID[3]);
-    //console.log("div ("+clickedCellID+") " + x + ", " + y + " clicked!");
-    if ( valid(x, y, currentPlayer) ) {
-        move(x, y, currentPlayer);
-        next();
-    }
-    else {
-        console.log("("+x+","+y+") is not a valid move for "
-            + (currentPlayer == X ? "black" : "red"));
-    }
-}
-
 function init() {
     var board = $("#board");
     var txt = "";
@@ -238,8 +223,9 @@ function init() {
 
     currentPlayer = X;
     stateCount = 0;
-    $("td").click(moveUser);
-    $("#result").html("Result:")
+    if ( playerType["Red"] == "Human" || playerType["Black"] == "Human" )
+        $("td").click(moveUser);
+    $("#result").html("");
 }
 
 function setupHandlers() {
@@ -257,6 +243,20 @@ function setupHandlers() {
     });
 }
 
+function moveUser() {
+    var clickedCellID = $(this).find("div").attr("id");
+    var x = parseInt(clickedCellID[1]);
+    var y = parseInt(clickedCellID[3]);
+    if ( valid(x, y, currentPlayer) ) {
+        move(x, y, currentPlayer);
+        next();
+    }
+    else {
+        console.log("("+x+","+y+") is not a valid move for "
+            + (currentPlayer == X ? "black" : "red"));
+    }
+}
+
 function moveAI() {
     stateCount = 0;
     //thinkingDepth = currentPlayer == X ? 2 : 4;
@@ -266,16 +266,21 @@ function moveAI() {
     next();
 }
 
-function next() {
+function next(flag) {
+    if ( !(flag == true) ) $("#info").html("");
     updateBoard();
+    updateScore();
     currentPlayer = -currentPlayer;
     setTimeout(run, delay);
 }
 
-function run() {
-    $("#info").html("Info:");
+function updateScore() {
     var c = count();
     $("#score").html("Score: Black: " + c.x + ", Red: " + c.o);
+}
+
+function run() {
+    //$("#info").html("");
     var w = winner();
     if ( w == X )
         $("#result").html("Black has won!");
@@ -285,7 +290,7 @@ function run() {
         $("#result").html("It is a tie!");
     else if ( !hasValidMove(currentPlayer) ) {
         $("#info").html("Info: " + strPlayer(currentPlayer) + " has no valid moves. It's " + strPlayer(-currentPlayer) + "'s turn.");
-        next();
+        next(true);
     }
     else {
         if ( playerType[strPlayer(currentPlayer)] == "AI" )

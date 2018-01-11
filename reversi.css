@@ -29,3 +29,11 @@ td {
 #result, #score, #info, #options {
     font-family: sans serif;
 }
+
+#result {
+    padding-top: 50px;
+}
+
+#options {
+    margin-top: 20px;
+}
