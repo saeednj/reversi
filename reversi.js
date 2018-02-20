@@ -6,7 +6,7 @@ console.log("@author Saeed Nejati");
 var X = 1;
 var O = -1;
 var INF = 2000000000;
-var thinkingDepth = 4;
+var thinkingDepth;
 
 var delay = 500;
 
@@ -14,6 +14,7 @@ var map;
 
 var currentPlayer;
 var playerType = {"Black" : "Human", "Red" : "Human"};
+var aiLevels = {"easy": 1, "medium": 2, "hard": 4};
 
 var stateCount;
 
@@ -216,10 +217,10 @@ function init() {
     }
     board.html(txt);
 
-    put(3, 3, X);
-    put(3, 4, O);
-    put(4, 3, O);
-    put(4, 4, X);
+    put(3, 3, O);
+    put(3, 4, X);
+    put(4, 3, X);
+    put(4, 4, O);
 
     currentPlayer = X;
     stateCount = 0;
@@ -233,9 +234,10 @@ function setupHandlers() {
         playerType["Black"] = $("#blackplayer").find(":selected").val();
         playerType["Red"] = $("#redplayer").find(":selected").val();
         var level = $("#ailevel").find(":selected").val();
-        if ( level == "easy" ) thinkingDepth = 1;
+        thinkingDepth = aiLevels[level];
+/*        if ( level == "easy" ) thinkingDepth = 1;
         else if ( level == "medium" ) thinkingDepth = 2;
-        else thinkingDepth = 4;
+        else thinkingDepth = 4;*/
         console.log(playerType);
         console.log("Thinking Depth: " + thinkingDepth);
         init();
@@ -280,7 +282,6 @@ function updateScore() {
 }
 
 function run() {
-    //$("#info").html("");
     var w = winner();
     if ( w == X )
         $("#result").html("Black has won!");
