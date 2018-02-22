@@ -307,14 +307,39 @@ function next(flag) {
     if ( !(flag == true) ) $("#info").html("");
     updateBoard();
     updateScore();
+    clearPossibleMoves();
     currentPlayer = -currentPlayer;
-    setTimeout(run, delay);
+    setTimeout(run, 1);
 }
 
 function updateScore() {
     //var c = count();
     var c = {x: bcnt, o: wcnt};
     $("#score").html("Score: Black: " + c.x + ", Red: " + c.o);
+}
+
+function showPossibleMoves() {
+    var i, j;
+    for( i=0; i<8; i++ )
+        for( j=0; j<8; j++ ) {
+            if ( valid(i, j, currentPlayer) ) {
+                $("#c" + i + "-" + j)
+                    .parent()
+                    .removeClass("unselected")
+                    .addClass("selected");
+            }
+        }
+}
+
+function clearPossibleMoves() {
+    var i, j;
+    for( i=0; i<8; i++ )
+        for( j=0; j<8; j++ ) {
+            $("#c" + i + "-" + j)
+                .parent()
+                .removeClass("selected")
+                .addClass("unselected");
+        }
 }
 
 function run() {
@@ -331,7 +356,9 @@ function run() {
     }
     else {
         if ( playerType[strPlayer(currentPlayer)] == "AI" )
-            moveAI();
+            setTimeout(moveAI, delay);
+        else
+            showPossibleMoves();
     }
 }
 
