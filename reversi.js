@@ -10,7 +10,7 @@ var thinkingDepth;
 
 var delay = 500;
 
-var map;
+var map, bcnt, wcnt;
 
 var currentPlayer;
 var playerType = {"Black" : "Human", "Red" : "Human"};
@@ -59,6 +59,7 @@ function hasValidMove(player) {
 function move(x, y, player) {
     map[x][y] = player;
 
+    if ( player == X ) bcnt++; else wcnt++;
     for( var dx=-1; dx<=1; dx++ )
         for( var dy=-1; dy<=1; dy++ ) {
             var opponent = 0, self = false;
@@ -70,7 +71,11 @@ function move(x, y, player) {
             }
             if ( self && opponent > 0 )
                 for( var I=x+dx,J=y+dy; I!=i || J!=j; I+=dx,J+=dy )
+                {
                     map[I][J] = player;
+                    bcnt += player;
+                    wcnt -= player;
+                }
         }
 }
 
@@ -110,7 +115,8 @@ function count() {
  *         INF if not finished
  */
 function winner() {
-    var c = count();
+    //var c = count();
+    var c = {x : bcnt, o: wcnt, e: 64-bcnt-wcnt};
     if ( c.e == 0 ) return (c.x > c.o ? X : c.x<c.o ? O : 0);
     if ( c.o == 0 && c.x > 0 ) return X;
     if ( c.x == 0 && c.o > 0 ) return O;
@@ -158,6 +164,8 @@ function value(player, depth, alpha, beta, maxPlayer) {
     stateCount++;
     var cut = false;
     var xx = -1, yy = -1;
+    var tmp, tmpbcnt, tmpwcnt;
+    var notmoved = true;
 
     for( var i=0; i<8 && !cut; i++ )
         for( var j=0; j<8 && !cut; j++ ) {
@@ -165,12 +173,17 @@ function value(player, depth, alpha, beta, maxPlayer) {
             if ( !valid(i, j, player) ) continue;
             if ( xx == -1 ) { xx = i; yy = j; }
 
-            var tmp = $.extend(true, [], map);
+            tmp = $.extend(true, [], map);
+            tmpbcnt = bcnt;
+            tmpwcnt = wcnt;
 
             move(i, j, player);
+            notmoved = false;
             var r = value(-player, depth-1, alpha, beta, maxPlayer);
 
             map = $.extend(true, [], tmp);
+            bcnt = tmpbcnt;
+            wcnt = tmpwcnt;
 
             if ( player == maxPlayer ) {
                 if ( r.v > alpha ) {
@@ -187,6 +200,25 @@ function value(player, depth, alpha, beta, maxPlayer) {
             if ( beta <= alpha )
                 cut = true;
         }
+
+    if ( notmoved ) {
+        tmp = $.extend(true, [], map);
+        tmpbcnt = bcnt;
+        tmpwcnt = wcnt;
+
+        var r = value(-player, depth-1, alpha, beta, maxPlayer);
+
+        map = $.extend(true, [], tmp);
+        bcnt = tmpbcnt;
+        wcnt = tmpwcnt;
+
+        if ( player == maxPlayer ) {
+            if ( r.v > alpha ) alpha = r.v;
+        }
+        else {
+            if ( r.v < beta ) beta = r.v;
+        }
+    }
 
     if ( player == maxPlayer ) {
         return {x: xx, y: yy, v: alpha};
@@ -222,11 +254,14 @@ function init() {
     put(4, 3, X);
     put(4, 4, O);
 
+    bcnt = wcnt = 2;
+
     currentPlayer = X;
     stateCount = 0;
     if ( playerType["Red"] == "Human" || playerType["Black"] == "Human" )
         $("td").click(moveUser);
     $("#result").html("");
+    updateScore();
 }
 
 function setupHandlers() {
@@ -277,7 +312,8 @@ function next(flag) {
 }
 
 function updateScore() {
-    var c = count();
+    //var c = count();
+    var c = {x: bcnt, o: wcnt};
     $("#score").html("Score: Black: " + c.x + ", Red: " + c.o);
 }
 
