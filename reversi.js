@@ -270,9 +270,6 @@ function setupHandlers() {
         playerType["Red"] = $("#redplayer").find(":selected").val();
         var level = $("#ailevel").find(":selected").val();
         thinkingDepth = aiLevels[level];
-/*        if ( level == "easy" ) thinkingDepth = 1;
-        else if ( level == "medium" ) thinkingDepth = 2;
-        else thinkingDepth = 4;*/
         console.log(playerType);
         console.log("Thinking Depth: " + thinkingDepth);
         init();
@@ -296,7 +293,6 @@ function moveUser() {
 
 function moveAI() {
     stateCount = 0;
-    //thinkingDepth = currentPlayer == X ? 2 : 4;
     var m = value(currentPlayer, thinkingDepth, -INF, INF, currentPlayer);
     move(m.x, m.y, currentPlayer);
     console.log("Number of processed states: " + stateCount);
@@ -313,7 +309,6 @@ function next(flag) {
 }
 
 function updateScore() {
-    //var c = count();
     var c = {x: bcnt, o: wcnt};
     $("#score").html("Score: Black: " + c.x + ", Red: " + c.o);
 }
@@ -365,3 +360,4 @@ function run() {
 init();
 setupHandlers();
 run();
+
