@@ -1,16 +1,17 @@
 console.log("-- Reversi --");
 console.log("@author Saeed Nejati");
 
-/* Data structures */
+/*** Data structures ***/
 
 var X = 1;
 var O = -1;
 var INF = 2000000000;
 var thinkingDepth;
 
-var delay = 500;
+var delay = 500; // The delay in miliseconds after each AI move
 
-var map, bcnt, wcnt;
+var map;         // Internal state of the board
+var xcnt, ocnt;  // Running count of xs and os on the board
 
 var currentPlayer;
 var playerType = {"Black" : "Human", "Red" : "Human"};
@@ -18,13 +19,13 @@ var aiLevels = {"easy": 1, "medium": 2, "hard": 4};
 
 var stateCount;
 
-/* Util functions */
+/*** Util functions ***/
 
 function inRange(x, y) {
     return (x >= 0 && x < 8 && y >= 0 && y < 8);
 }
 
-/** checks if a player can put his peg on cell (x, y) */
+/** Checks if a player can put his peg on cell (x, y) */
 function valid(x, y, player) {
     if ( !inRange(x, y) ) return false;
     if ( map[x][y] ) return false;
@@ -42,8 +43,7 @@ function valid(x, y, player) {
     return false;
 }
 
-/** checks if a player has any valid moves on the board */
-/* NOTE: can be improved maybe */
+/** Checks if a player has any valid moves on the board */
 function hasValidMove(player) {
     for( var i=0; i<8; i++ )
         for( var j=0; j<8; j++ )
@@ -54,12 +54,14 @@ function hasValidMove(player) {
 
 /** Performs a move for a player by putting
  * a peg on cell (x, y) and flipping necessary pegs
- * NOTE: The move should be valid
+ *
+ * - Only updates the internal map
+ * - The move should be valid
  */
 function move(x, y, player) {
     map[x][y] = player;
 
-    if ( player == X ) bcnt++; else wcnt++;
+    if ( player == X ) xcnt++; else ocnt++;
     for( var dx=-1; dx<=1; dx++ )
         for( var dy=-1; dy<=1; dy++ ) {
             var opponent = 0, self = false;
@@ -73,13 +75,16 @@ function move(x, y, player) {
                 for( var I=x+dx,J=y+dy; I!=i || J!=j; I+=dx,J+=dy )
                 {
                     map[I][J] = player;
-                    bcnt += player;
-                    wcnt -= player;
+                    xcnt += player;
+                    ocnt -= player;
                 }
         }
 }
 
-/** puts a peg at the given position on board */
+/** Puts a peg at the given position on board
+ *
+ * - Updates the internal map and the UI board
+ */
 function put(i, j, peg) {
     map[i][j] = peg;
     $("#c" + i + "-" + j)
@@ -89,7 +94,7 @@ function put(i, j, peg) {
     .addClass(function(){return peg == X ? "black" : "red"});
 }
 
-/** Redraws pegs on the board */
+/** Redraws pegs on the UI board */
 function updateBoard() {
     for( var i=0; i<8; i++ )
         for( var j=0; j<8; j++ )
@@ -116,7 +121,7 @@ function count() {
  */
 function winner() {
     //var c = count();
-    var c = {x : bcnt, o: wcnt, e: 64-bcnt-wcnt};
+    var c = {x : xcnt, o: ocnt, e: 64-xcnt-ocnt};
     if ( c.e == 0 ) return (c.x > c.o ? X : c.x<c.o ? O : 0);
     if ( c.o == 0 && c.x > 0 ) return X;
     if ( c.x == 0 && c.o > 0 ) return O;
@@ -164,7 +169,7 @@ function value(player, depth, alpha, beta, maxPlayer) {
     stateCount++;
     var cut = false;
     var xx = -1, yy = -1;
-    var tmp, tmpbcnt, tmpwcnt;
+    var tmp, tmpxcnt, tmpocnt;
     var notmoved = true;
 
     for( var i=0; i<8 && !cut; i++ )
@@ -174,16 +179,16 @@ function value(player, depth, alpha, beta, maxPlayer) {
             if ( xx == -1 ) { xx = i; yy = j; }
 
             tmp = $.extend(true, [], map);
-            tmpbcnt = bcnt;
-            tmpwcnt = wcnt;
+            tmpxcnt = xcnt;
+            tmpocnt = ocnt;
 
             move(i, j, player);
             notmoved = false;
             var r = value(-player, depth-1, alpha, beta, maxPlayer);
 
             map = $.extend(true, [], tmp);
-            bcnt = tmpbcnt;
-            wcnt = tmpwcnt;
+            xcnt = tmpxcnt;
+            ocnt = tmpocnt;
 
             if ( player == maxPlayer ) {
                 if ( r.v > alpha ) {
@@ -203,14 +208,14 @@ function value(player, depth, alpha, beta, maxPlayer) {
 
     if ( notmoved ) {
         tmp = $.extend(true, [], map);
-        tmpbcnt = bcnt;
-        tmpwcnt = wcnt;
+        tmpxcnt = xcnt;
+        tmpocnt = ocnt;
 
         var r = value(-player, depth-1, alpha, beta, maxPlayer);
 
         map = $.extend(true, [], tmp);
-        bcnt = tmpbcnt;
-        wcnt = tmpwcnt;
+        xcnt = tmpxcnt;
+        ocnt = tmpocnt;
 
         if ( player == maxPlayer ) {
             if ( r.v > alpha ) alpha = r.v;
@@ -232,7 +237,7 @@ function strPlayer(player) {
     return player == X ? "Black" : "Red";
 }
 
-/* Main structure */
+/*** Main structure ***/
 
 function init() {
     var board = $("#board");
@@ -254,7 +259,7 @@ function init() {
     put(4, 3, X);
     put(4, 4, O);
 
-    bcnt = wcnt = 2;
+    xcnt = ocnt = 2;
 
     currentPlayer = X;
     stateCount = 0;
@@ -309,7 +314,7 @@ function next(flag) {
 }
 
 function updateScore() {
-    var c = {x: bcnt, o: wcnt};
+    var c = {x: xcnt, o: ocnt};
     $("#score").html("Score: Black: " + c.x + ", Red: " + c.o);
 }
 
