@@ -6,31 +6,36 @@
         <title>Reversi</title>
     </head>
     <body>
-        <div>
-            <table id="board">
-            </table>
-            <div id="result"></div>
-            <div id="score">Score: </div>
-            <div id="info"></div>
-            <div id="options">
-                Black:
-                <select id="blackplayer">
-                    <option value="Human" selected="selected">Human</option>
-                    <option value="AI">AI</option>
-                </select>
-                Red:
-                <select id="redplayer">
-                    <option value="Human" selected="selected">Human</option>
-                    <option value="AI">AI</option>
-                </select>
-                <input type="button" id="newgame" value="New Game">
-                <br>
-                AI Level:
-                <select id="ailevel">
-                    <option value="easy" selected="selected">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
-                </select>
+        <div id="container">
+            <div id="board-container">
+                <table id="board">
+                </table>
+            </div>
+            <div id="ui-container">
+                <div id="result"></div>
+                <div id="score">Score: </div>
+                <div id="info"></div>
+                <div id="options">
+                    Black:
+                    <select id="blackplayer">
+                        <option value="Human" selected="selected">Human</option>
+                        <option value="AI">AI</option>
+                    </select> &nbsp;
+                    Red:
+                    <select id="redplayer">
+                        <option value="Human" selected="selected">Human</option>
+                        <option value="AI">AI</option>
+                    </select> &nbsp;
+                    AI Level:
+                    <select id="ailevel">
+                        <option value="easy" selected="selected">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                    <br>
+                    <br>
+                    <input type="button" id="newgame" value="New Game">
+                </div>
             </div>
         </div>
         <script src="reversi.js"></script>

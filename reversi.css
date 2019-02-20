@@ -34,6 +34,21 @@ td {
     visibility: hidden;
 }
 
+#container {
+    width: 90%;
+    margin: auto;
+    display: flex;
+    padding-top: 50px;
+}
+
+#board-container {
+    flex: 1;
+}
+
+#ui-container {
+    flex: 0 0 70%;
+}
+
 #result, #score, #info, #options {
     font-family: sans serif;
 }
@@ -45,3 +60,4 @@ td {
 #options {
     margin-top: 20px;
 }
+
