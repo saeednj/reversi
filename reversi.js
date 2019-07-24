@@ -8,14 +8,16 @@ var O = -1;
 var INF = 2000000000;
 var thinkingDepth;
 
-var delay = 500; // The delay in miliseconds after each AI move
+var delay = 500;             // The delay in miliseconds after each AI move
 
-var map;         // Internal state of the board
-var xcnt, ocnt;  // Running count of xs and os on the board
+var map;                     // Internal state of the board
+var cnt = {[X]: 0, [O]: 0};  // Running count of xs and os on the board
 
 var currentPlayer;
-var playerType = {"Black" : "Human", "Red" : "Human"};
+var playerType = {[X] : "Human", [O] : "Human"};
 var aiLevels = {"easy": 1, "medium": 2, "hard": 4};
+
+var playerColor = {[X]: "Black", [O]: "Red"};
 
 var stateCount;
 
@@ -45,6 +47,11 @@ function valid(x, y, player) {
 
 /** Checks if a player has any valid moves on the board */
 function hasValidMove(player) {
+    if ( cnt[X] == 0 || cnt[O] == 0 ) // one of the player doesn't have any pegs left!
+        return false;
+    if ( cnt[X] + cnt[O] == 64 ) // there are no empty cells
+        return false;
+
     for( var i=0; i<8; i++ )
         for( var j=0; j<8; j++ )
             if ( map[i][j] == 0 && valid(i, j, player) )
@@ -61,7 +68,7 @@ function hasValidMove(player) {
 function move(x, y, player) {
     map[x][y] = player;
 
-    if ( player == X ) xcnt++; else ocnt++;
+    cnt[player]++;
     for( var dx=-1; dx<=1; dx++ )
         for( var dy=-1; dy<=1; dy++ ) {
             var opponent = 0, self = false;
@@ -75,8 +82,8 @@ function move(x, y, player) {
                 for( var I=x+dx,J=y+dy; I!=i || J!=j; I+=dx,J+=dy )
                 {
                     map[I][J] = player;
-                    xcnt += player;
-                    ocnt -= player;
+                    cnt[X] += player;
+                    cnt[O] -= player;
                 }
         }
 }
@@ -101,18 +108,6 @@ function updateBoard() {
             if ( map[i][j] ) put(i, j, map[i][j]);
 }
 
-/** Counts the number of Xs and Os on the board */
-function count() {
-    var x = 0, o = 0, e = 0;
-
-    for( var i=0; i<8; i++ )
-       for( var j=0; j<8; j++ )
-           if ( map[i][j] == X ) x++;
-           else if ( map[i][j] == O ) o++;
-           else e++;
-    return {x: x, o: o, e: e};
-}
-
 /** Checks if any player has won the game
  * @return 1   if X is winner
  *         -1  if O is winner
@@ -120,12 +115,8 @@ function count() {
  *         INF if not finished
  */
 function winner() {
-    //var c = count();
-    var c = {x : xcnt, o: ocnt, e: 64-xcnt-ocnt};
-    if ( c.e == 0 ) return (c.x > c.o ? X : c.x<c.o ? O : 0);
-    if ( c.o == 0 && c.x > 0 ) return X;
-    if ( c.x == 0 && c.o > 0 ) return O;
-    if ( !hasValidMove(X) && !hasValidMove(O) ) return (c.x > c.o ? X : c.x<c.o ? O : 0);
+    if ( !hasValidMove(X) && !hasValidMove(O) ) // if one of the players has a valid move, the game is not finished
+        return (cnt[X] > cnt[O] ? X : cnt[X] < cnt[O] ? O : 0);
     return INF;
  }
 
@@ -179,16 +170,16 @@ function value(player, depth, alpha, beta, maxPlayer) {
             if ( xx == -1 ) { xx = i; yy = j; }
 
             tmp = $.extend(true, [], map);
-            tmpxcnt = xcnt;
-            tmpocnt = ocnt;
+            tmpxcnt = cnt[X];
+            tmpocnt = cnt[O];
 
             move(i, j, player);
             notmoved = false;
             var r = value(-player, depth-1, alpha, beta, maxPlayer);
 
             map = $.extend(true, [], tmp);
-            xcnt = tmpxcnt;
-            ocnt = tmpocnt;
+            cnt[X] = tmpxcnt;
+            cnt[O] = tmpocnt;
 
             if ( player == maxPlayer ) {
                 if ( r.v > alpha ) {
@@ -208,14 +199,14 @@ function value(player, depth, alpha, beta, maxPlayer) {
 
     if ( notmoved ) {
         tmp = $.extend(true, [], map);
-        tmpxcnt = xcnt;
-        tmpocnt = ocnt;
+        tmpxcnt = cnt[X];
+        tmpocnt = cnt[O];
 
         var r = value(-player, depth-1, alpha, beta, maxPlayer);
 
         map = $.extend(true, [], tmp);
-        xcnt = tmpxcnt;
-        ocnt = tmpocnt;
+        cnt[X] = tmpxcnt;
+        cnt[O] = tmpocnt;
 
         if ( player == maxPlayer ) {
             if ( r.v > alpha ) alpha = r.v;
@@ -232,10 +223,6 @@ function value(player, depth, alpha, beta, maxPlayer) {
     return {x: xx, y: yy, v: beta};
 }
 
-
-function strPlayer(player) {
-    return player == X ? "Black" : "Red";
-}
 
 /*** Main structure ***/
 
@@ -259,11 +246,11 @@ function init() {
     put(4, 3, X);
     put(4, 4, O);
 
-    xcnt = ocnt = 2;
+    cnt[X] = cnt[O] = 2;
 
     currentPlayer = X;
     stateCount = 0;
-    if ( playerType["Red"] == "Human" || playerType["Black"] == "Human" )
+    if ( playerType[X] == "Human" || playerType[O] == "Human" )
         $("td").click(moveUser);
     $("#result").html("");
     updateScore();
@@ -271,8 +258,8 @@ function init() {
 
 function setupHandlers() {
     $("#newgame").click(function(){
-        playerType["Black"] = $("#blackplayer").find(":selected").val();
-        playerType["Red"] = $("#redplayer").find(":selected").val();
+        playerType[X] = $("#blackplayer").find(":selected").val();
+        playerType[O] = $("#redplayer").find(":selected").val();
         var level = $("#ailevel").find(":selected").val();
         thinkingDepth = aiLevels[level];
         console.log(playerType);
@@ -314,8 +301,7 @@ function next(flag) {
 }
 
 function updateScore() {
-    var c = {x: xcnt, o: ocnt};
-    $("#score").html("Score: Black: " + c.x + ", Red: " + c.o);
+    $("#score").html("Score: " + playerColor[X] + ": " + cnt[X] + ", " + playerColor[O] + ": " + cnt[O]);
 }
 
 function showPossibleMoves() {
@@ -344,18 +330,16 @@ function clearPossibleMoves() {
 
 function run() {
     var w = winner();
-    if ( w == X )
-        $("#result").html("Black has won!");
-    else if ( w == O )
-        $("#result").html("Red has won!");
+    if ( w == X || w == O )
+        $("#result").html(playerColor[w] + " has won!");
     else if ( w == 0 )
         $("#result").html("It is a tie!");
     else if ( !hasValidMove(currentPlayer) ) {
-        $("#info").html("Info: " + strPlayer(currentPlayer) + " has no valid moves. It's " + strPlayer(-currentPlayer) + "'s turn.");
+        $("#info").html("Info: " + playerColor[currentPlayer] + " has no valid moves. It's " + playerColor[-currentPlayer] + "'s turn.");
         next(true);
     }
     else {
-        if ( playerType[strPlayer(currentPlayer)] == "AI" )
+        if ( playerType[currentPlayer] == "AI" )
             setTimeout(moveAI, delay);
         else
             showPossibleMoves();
