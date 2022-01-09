@@ -1,6 +1,6 @@
 td {
-    width: 50px;
-    height: 50px;
+    width: 75px;
+    height: 75px;
     border: 2px outset black;
     background-color: #bb8855;
 }
@@ -9,8 +9,8 @@ td {
     margin: auto;
     background-color: red;
     border: 1px solid black;
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
 }
 
@@ -34,30 +34,37 @@ td {
     visibility: hidden;
 }
 
-#container {
-    width: 90%;
-    margin: auto;
-    display: flex;
-    padding-top: 50px;
-}
-
 #board-container {
-    flex: 1;
+    display: flex;
+    justify-content: center;
+    float: left;
+    align-items: center;
+    height: 100%;
+    width: 80%;
 }
 
 #ui-container {
-    flex: 0 0 70%;
+    display: flex;
+    float: right;
+    width: 19%;
+    height: 100%;
 }
 
-#result, #score, #info, #options {
+#ui-inner-container {
+    display: block;
     font-family: sans serif;
+    font-size: 16pt;
 }
 
-#result {
-    padding-top: 50px;
+#score {
+    margin-top: 100%;
 }
 
-#options {
-    margin-top: 20px;
+#info {
+    margin-top: 20%;
+}
+
+option, input{
+    font-size:16pt;
 }
 

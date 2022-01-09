@@ -135,9 +135,9 @@ function score(player) {
     ];
 
     weight[1][1] = weight[1][0] = weight[0][1] = (map[0][0] == player) ? 2 : -1;
- 	weight[1][6] = weight[1][7] = weight[0][6] = (map[0][7] == player) ? 2 : -1;
- 	weight[6][1] = weight[7][1] = weight[6][0] = (map[7][0] == player) ? 2 : -1;
- 	weight[6][6] = weight[7][6] = weight[6][7] = (map[7][7] == player) ? 2 : -1;
+    weight[1][6] = weight[1][7] = weight[0][6] = (map[0][7] == player) ? 2 : -1;
+    weight[6][1] = weight[7][1] = weight[6][0] = (map[7][0] == player) ? 2 : -1;
+    weight[6][6] = weight[7][6] = weight[6][7] = (map[7][7] == player) ? 2 : -1;
 
     var s = 0;
     for( var i=0; i<8; i++ )
@@ -165,7 +165,6 @@ function value(player, depth, alpha, beta, maxPlayer) {
 
     for( var i=0; i<8 && !cut; i++ )
         for( var j=0; j<8 && !cut; j++ ) {
-            if ( map[i][j] ) continue;
             if ( !valid(i, j, player) ) continue;
             if ( xx == -1 ) { xx = i; yy = j; }
 

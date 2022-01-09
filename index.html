@@ -6,26 +6,29 @@
         <title>Reversi</title>
     </head>
     <body>
-        <div id="container">
-            <div id="board-container">
-                <table id="board">
-                </table>
-            </div>
-            <div id="ui-container">
+        <div id="board-container">
+            <table id="board">
+            </table>
+        </div>
+        <div id="ui-container">
+            <div id="ui-inner-container">
                 <div id="result"></div>
                 <div id="score">Score: </div>
+                <br>
                 <div id="info"></div>
                 <div id="options">
                     Black:
                     <select id="blackplayer">
                         <option value="Human" selected="selected">Human</option>
                         <option value="AI">AI</option>
-                    </select> &nbsp;
+                    </select>
+                    <br>
                     Red:
                     <select id="redplayer">
                         <option value="Human" selected="selected">Human</option>
                         <option value="AI">AI</option>
-                    </select> &nbsp;
+                    </select>
+                    <br>
                     AI Level:
                     <select id="ailevel">
                         <option value="easy" selected="selected">Easy</option>
